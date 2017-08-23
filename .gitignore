@@ -1,0 +1,11 @@
+# package directories
+node_modules
+
+# Vim
+*.swp
+Session.vim
+
+# nyc
+.nyc_output
+coverage
+
