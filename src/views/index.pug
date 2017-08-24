@@ -40,10 +40,9 @@ block content
                   input(type='submit', name='uploadImage')
 
       //- Image List
-      if images
+      if photos
         .col-lg-12.col-sm-12.col-12
-          for image in images
+          for photo in photos
             .col-xs-4
               .thumbnail
-                //- img(src=image)
-                img(src=image)
+                img(src=photo)

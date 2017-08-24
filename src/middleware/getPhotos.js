@@ -11,17 +11,17 @@
   limitations under the License.
 */
 
-const list = conn => (limit = 12) => new Promise((resolve, reject) => {
-  const sql = 'SELECT * FROM `photos` LIMIT ?';
-  conn.query(sql, [limit], (err, res) => (err ? reject(err) : resolve(res)));
-});
+const photoStoreWithConn = require('../stores/photo');
 
-const upsert = conn => photo => new Promise((resolve, reject) => {
-  const sql = 'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)';
-  conn.query(sql, photo, (err, res) => (err ? reject(err) : resolve(res)));
-});
-
-module.exports = conn => ({
-  list: list(conn),
-  upsert: upsert(conn),
-});
+module.exports = mysql => (req, res, next) => {
+  const photoStore = photoStoreWithConn(mysql);
+  return photoStore.list()
+    .then((photos) => {
+      res.locals.photos = photos;
+      next();
+    })
+    .catch((e) => {
+      res.locals.error = e;
+      next();
+    });
+};

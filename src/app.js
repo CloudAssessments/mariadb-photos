@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const mysql = mysql2.createConnection({
   host: process.env.MARIA_HOST,
   port: process.env.MARIA_PORT,
-  user: process.env.MARIA_USER,
+  user: process.env.MARIA_USER || 'root',
   password: process.env.MARIA_PASSWORD,
   database: process.env.MARIA_DATABASE || 'photo_demo',
 });
@@ -47,7 +47,11 @@ sub.on('error', err => console.error('REDIS_ERROR: ', err));
 sub.subscribe('upload');
 
 // Routes: Homepage
-app.get('/', require('./middleware/homepage'));
+app.get(
+  '/',
+  require('./middleware/getPhotos')(mysql),
+  require('./middleware/homepage')
+);
 
 // Routes: Upload Photo
 app.post(
