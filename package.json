@@ -1,6 +1,11 @@
 {
   "name": "mariadb-photos",
   "version": "1.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CloudAssessments/mariadb-photos.git"
+  },
   "description": "A demo to enable users to get and upload photos to using Node.js, MariaDB, Redis, and Docker Compose",
   "main": "app.js",
   "scripts": {
