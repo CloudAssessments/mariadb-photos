@@ -11,8 +11,21 @@
   limitations under the License.
 */
 
-module.exports = redisPub => (req, res) => {
-  const photo = { ...res.locals.image, buffer: res.locals.editedImage };
-  redisPub.publish('upload', new Buffer.from(JSON.stringify(photo)));
-  res.redirect('/');
+const redirect = (res, err) => res.redirect(`/?err=${JSON.stringify(err)}`);
+
+module.exports = jimp => (req, res, next) => {
+  jimp.read(res.locals.image.buffer, (err, image) => {
+    if (err) {
+      return redirect(res, { code: err.code, message: err.message });
+    }
+
+    image.greyscale().getBuffer(jimp.AUTO, (bufferErr, buffer) => {
+      if (bufferErr) {
+        return redirect(res, { code: bufferErr.code, message: bufferErr.message });
+      }
+
+      res.locals.editedImage = buffer;
+      return next();
+    });
+  });
 };
