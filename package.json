@@ -1,0 +1,37 @@
+{
+  "name": "mariadb-photos",
+  "version": "1.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CloudAssessments/mariadb-photos.git"
+  },
+  "description": "A demo to enable users to get and upload photos to using Node.js, MariaDB, Redis, and Docker Compose",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon ./src/bin/www",
+    "lint": "eslint",
+    "prod": "node ./src/bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "demo",
+    "photo",
+    "storage",
+    "filter",
+    "redis",
+    "mariadb",
+    "docker",
+    "compose"
+  ],
+  "author": "jonathan lee <jonl@linuxacademy.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.15.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.3.0",
+    "eslint-config-airbnb-base": "^11.3.1",
+    "eslint-plugin-import": "^2.7.0"
+  }
+}
