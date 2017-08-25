@@ -15,5 +15,8 @@ module.exports = {
     "no-confusing-arrow": ["warn", { allowParens: true }],
     "max-len": ["warn", { code: 90, ignoreComments: true, ignorePattern: '^test\\(' }],
     "no-console": "off",
+    "new-cap": ["error", { "properties": false }], // i.e.) `new Buffer.from` is ok
+    "no-param-reassign": ["error", { "props": false }],
+    "import/no-extraneous-dependencies": [2, { "devDependencies": true }]
   },
 };
