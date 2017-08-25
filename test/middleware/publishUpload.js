@@ -21,13 +21,18 @@ test.cb('should publish an upload message and redirect to homepage', (t) => {
   const mockRes = {
     locals: {
       image: { foo: 'bar' },
+      editedImage: new Buffer('grey-bar'),
     },
     redirect: sinon.mock(),
   };
 
   redisPub.publish
     .once()
-    .withArgs('upload', new Buffer.from(JSON.stringify(mockRes.locals.image)));
+    .withArgs('upload', new Buffer.from(JSON.stringify(Object.assign(
+      {},
+      mockRes.locals.image,
+      { buffer: mockRes.locals.editedImage }
+    ))));
 
   mockRes.redirect
     .once()

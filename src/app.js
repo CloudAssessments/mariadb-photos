@@ -11,6 +11,7 @@
   limitations under the License.
 */
 const express = require('express');
+const jimp = require('jimp');
 const multer = require('multer');
 const mysql2 = require('mysql2');
 const path = require('path');
@@ -47,13 +48,18 @@ sub.on('error', err => console.error('REDIS_ERROR: ', err));
 sub.subscribe('upload');
 
 // Routes: Homepage
-app.get('/', require('./middleware/homepage'));
+app.get(
+  '/',
+  require('./middleware/getPhotos')(mysql),
+  require('./middleware/homepage')
+);
 
 // Routes: Upload Photo
 app.post(
   '/photo',
   multer().single('uploadedImage'),
   require('./middleware/multipartToImage'),
+  require('./middleware/filterGreyscale')(jimp),
   require('./middleware/publishUpload')(pub)
 );
 

@@ -11,8 +11,17 @@
   limitations under the License.
 */
 
-module.exports = redisPub => (req, res) => {
-  const photo = { ...res.locals.image, buffer: res.locals.editedImage };
-  redisPub.publish('upload', new Buffer.from(JSON.stringify(photo)));
-  res.redirect('/');
+const photoStoreWithConn = require('../stores/photo');
+
+module.exports = mysql => (req, res, next) => {
+  const photoStore = photoStoreWithConn(mysql);
+  return photoStore.list()
+    .then((photos) => {
+      res.locals.photos = photos;
+      next();
+    })
+    .catch((e) => {
+      res.locals.error = e;
+      next();
+    });
 };

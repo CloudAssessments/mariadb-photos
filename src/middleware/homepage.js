@@ -12,5 +12,19 @@
 */
 
 module.exports = (req, res) => {
-  res.render('index');
+  const ctx = {};
+
+  // surface errors to front-end if they exist
+  if (req.query && req.query.err) {
+    ctx.err = req.query.err;
+  }
+
+  // pass in photos if they exist
+  if (res.locals && res.locals.photos) {
+    ctx.photos = res.locals.photos.map(
+      image => `data:${image.mime_type};base64,${image.data.toString('base64')}`
+    );
+  }
+
+  res.render('index', ctx);
 };
