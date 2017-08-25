@@ -13,7 +13,7 @@
 const mysql2 = require('mysql2');
 
 const conn = mysql2.createConnection({
-  host: process.env.MARIA_HOST,
+  host: process.env.MARIA_HOST || (process.env.DOCKER_COMPOSE ? 'mysql' : undefined),
   port: process.env.MARIA_PORT,
   user: process.env.MARIA_USER || 'root',
   password: process.env.MARIA_PASSWORD,

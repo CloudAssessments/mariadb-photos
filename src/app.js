@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // initialize mysql connection
 const mysql = mysql2.createConnection({
-  host: process.env.MARIA_HOST,
+  host: process.env.MARIA_HOST || (process.env.DOCKER_COMPOSE && 'mysql'),
   port: process.env.MARIA_PORT,
   user: process.env.MARIA_USER || 'root',
   password: process.env.MARIA_PASSWORD,
@@ -35,7 +35,7 @@ const mysql = mysql2.createConnection({
 
 // initialize redis pub/sub for image upload work
 const redisServer = {
-  host: process.env.REDIS_HOST,
+  host: process.env.REDIS_HOST || (process.env.DOCKER_COMPOSE && 'redis'),
   port: process.env.REDIS_PORT,
   url: process.env.REDIS_URL,
   password: process.env.REDIS_PASSWORD,

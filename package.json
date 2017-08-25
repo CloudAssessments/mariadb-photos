@@ -14,7 +14,7 @@
     "db-install": "node ./src/scripts/db-install.js",
     "dev": "nodemon ./src/bin/www",
     "lint": "eslint",
-    "prod": "node ./src/bin/www",
+    "prod": "node ./src/scripts/db-install.js; node ./src/bin/www",
     "test": "nyc -r text -r html ava -T 300000 -c 10 'test'"
   },
   "keywords": [

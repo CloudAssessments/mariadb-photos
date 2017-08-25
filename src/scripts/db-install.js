@@ -14,7 +14,7 @@ const mysql2 = require('mysql2');
 
 const database = process.env.MARIA_DATABASE || 'photo_demo';
 const config = {
-  host: process.env.MARIA_HOST,
+  host: process.env.MARIA_HOST || (process.env.DOCKER_COMPOSE ? 'mysql' : undefined),
   port: process.env.MARIA_PORT,
   user: process.env.MARIA_USER || 'root',
   password: process.env.MARIA_PASSWORD,
