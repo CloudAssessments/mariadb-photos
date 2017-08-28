@@ -8,5 +8,12 @@ RUN mkdir /app
 WORKDIR /app
 ADD . /app
 
-# Install node deps for each app
-RUN npm install --quiet
+# Copy over only files needed to install dependencies
+# This will allow Docker to reuse a cached image if no dependencies have changed
+# effectively speeding up image build times on local machines
+ADD ./package.json /app
+ADD ./package-lock.json /app
+RUN npm install -q
+
+# Copy over all source
+ADD . /app
