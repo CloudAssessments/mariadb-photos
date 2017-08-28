@@ -9,6 +9,9 @@
   "description": "A demo to enable users to get and upload photos to using Node.js, MariaDB, Redis, and Docker Compose",
   "main": "app.js",
   "scripts": {
+    "clean": "rm -rf node_modules; npm run db-clean",
+    "db-clean": "node ./src/scripts/db-clean.js",
+    "db-install": "node ./src/scripts/db-install.js",
     "dev": "nodemon ./src/bin/www",
     "lint": "eslint",
     "prod": "node ./src/bin/www",
@@ -38,6 +41,7 @@
     "eslint": "^4.3.0",
     "eslint-config-airbnb-base": "^11.3.1",
     "eslint-plugin-import": "^2.7.0",
+    "nodemon": "^1.11.0",
     "nyc": "^11.0.3",
     "sinon": "^3.2.1"
   }
