@@ -12,7 +12,7 @@ ADD . /app
 # This will allow Docker to reuse a cached image if no dependencies have changed
 # effectively speeding up image build times on local machines
 ADD ./package.json /app
-ADD ./package-lock.json /app
+# ADD ./package-lock.json /app  # uncomment when finalized
 RUN npm install -q
 
 # Copy over all source
