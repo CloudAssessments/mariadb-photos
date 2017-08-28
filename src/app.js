@@ -47,7 +47,11 @@ sub.on('error', err => console.error('REDIS_ERROR: ', err));
 sub.subscribe('upload');
 
 // Routes: Homepage
-app.get('/', require('./middleware/homepage'));
+app.get(
+  '/',
+  require('./middleware/getPhotos')(mysql),
+  require('./middleware/homepage')
+);
 
 // Routes: Upload Photo
 app.post(
