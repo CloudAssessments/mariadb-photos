@@ -10,13 +10,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 const { test } = require('ava');
 const sinon = require('sinon');
 const upload = require('../../src/listeners/upload');
 
 test.beforeEach((t) => {
   t.context.mockMysql = { query: sinon.mock() };
+  t.context.mockIo = { emit: sinon.mock() };
 });
 
 test('should upload a photo to mysql', (t) => {
@@ -36,16 +36,21 @@ test('should upload a photo to mysql', (t) => {
       cb(null, { affectedRows: 1 });
     });
 
-  return upload(t.context.mockMysql)('upload', JSON.stringify(testMessageJSON))
-    .then((res) => {
-      t.is(res.affectedRows, 1);
+  t.context.mockIo.emit
+    .once()
+    .withArgs('broadcast', 'uploaded')
+    .resolves();
+
+  const uploadWithDeps = upload(t.context.mockMysql, t.context.mockIo);
+  return uploadWithDeps('upload', JSON.stringify(testMessageJSON))
+    .then(() => {
       t.context.mockMysql.query.verify();
     });
 });
 
 test('should reject if message is not valid JSON', (t) => {
   t.context.mockMysql.query.never();
-  return upload(t.context.mockMysql)('upload', 'invalidJSON')
+  return upload(t.context.mockMysql, t.context.mockIo)('upload', 'invalidJSON')
     .catch(() => {
       t.pass();
       t.context.mockMysql.query.verify();
