@@ -47,7 +47,7 @@ const redisServer = {
 };
 const pub = redis.createClient(redisServer);
 const sub = redis.createClient(redisServer);
-sub.on('message', require('./listeners/upload')(mysql, io, pub));
+sub.on('message', require('./listeners/upload')(mysql, io));
 
 sub.on('error', err => console.error('REDIS_ERROR: ', err));
 sub.subscribe('upload');

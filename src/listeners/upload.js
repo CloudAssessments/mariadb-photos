@@ -12,7 +12,7 @@
 */
 const photoStoreWithConn = require('../stores/photo');
 
-module.exports = (mysql, io, redisPub) => (channel, message) => {
+module.exports = (mysql, io) => (channel, message) => {
   try {
     const photoStore = photoStoreWithConn(mysql);
     const parsedMessage = JSON.parse(message);
@@ -23,11 +23,8 @@ module.exports = (mysql, io, redisPub) => (channel, message) => {
       data: new Buffer.from(parsedMessage.buffer.data),
     };
 
-    setTimeout(() => photoStore.upsert(photo)
-      .then(() => io.emit('broadcast', 'uploaded')), 1000);
-
-    // return photoStore.upsert(photo)
-    //   .then(() => io.emit('broadcast', 'uploaded'));
+    return photoStore.upsert(photo)
+      .then(() => io.emit('broadcast', 'uploaded'));
   } catch (e) {
     /* istanbul ignore if */
     if (!process.env.AVA_PATH) {
