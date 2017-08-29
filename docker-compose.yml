@@ -1,12 +1,29 @@
 version: '3'
 services:
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_USER: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+    ports:
+      - "3316:3306" # Host: 3316 - Container: 3306
+
+  redis:
+    image: redis
+    ports:
+      - "6389:6379" # Host: 6389 - Container: 6379
+
   mariadb-photos:
     build: .
     image: mariadb-photos:test
     command: npm run prod
+    links:
+      - mariadb:mysql
+      - redis
     ports:
       - '3000:3000'
     environment:
+      DOCKER_COMPOSE: 'true'
       PORT: '3000'
       MARIA_HOST:
       MARIA_PORT:

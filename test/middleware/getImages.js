@@ -41,7 +41,7 @@ test.cb('should add photos to res.locals from mysql', (t) => {
   t.context.mockMysql.query
     .once()
     .callsFake((sql, [limit], cb) => {
-      t.is(sql, 'SELECT * FROM `photos` LIMIT ?');
+      t.is(sql, 'SELECT * FROM `photos` ORDER BY `id` DESC LIMIT ?');
       t.is(limit, 12);
       cb(null, rows);
     });
@@ -62,7 +62,7 @@ test.cb('should add error to res.locals if one occurs', (t) => {
   t.context.mockMysql.query
     .once()
     .callsFake((sql, [limit], cb) => {
-      t.is(sql, 'SELECT * FROM `photos` LIMIT ?');
+      t.is(sql, 'SELECT * FROM `photos` ORDER BY `id` DESC LIMIT ?');
       t.is(limit, 12);
       cb(new Error('oops'));
     });

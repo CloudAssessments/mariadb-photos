@@ -12,7 +12,7 @@
 */
 
 const list = conn => (limit = 12) => new Promise((resolve, reject) => {
-  const sql = 'SELECT * FROM `photos` LIMIT ?';
+  const sql = 'SELECT * FROM `photos` ORDER BY `id` DESC LIMIT ?';
   conn.query(sql, [limit], (err, res) => (err ? reject(err) : resolve(res)));
 });
 
