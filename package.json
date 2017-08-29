@@ -9,7 +9,7 @@
   "description": "A demo to enable users to get and upload photos to using Node.js, MariaDB, Redis, and Docker Compose",
   "main": "app.js",
   "scripts": {
-    "clean": "npm run db-clean; rm -rf node_modules;",
+    "clean": "npm run db-clean; rm -rf node_modules",
     "db-clean": "node ./src/scripts/db-clean.js",
     "db-install": "node ./src/scripts/db-install.js",
     "dev": "nodemon ./src/bin/www",
