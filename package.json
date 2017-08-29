@@ -13,9 +13,11 @@
     "db-clean": "node ./src/scripts/db-clean.js",
     "db-install": "node ./src/scripts/db-install.js",
     "dev": "nodemon ./src/bin/www",
+    "empty-uploads": "node ./src/scripts/empty-uploads",
     "lint": "eslint",
-    "prod": "node ./src/scripts/db-install.js; node ./src/bin/www",
-    "test": "nyc -r text -r html ava -T 300000 -c 10 'test'"
+    "prod": "node ./src/bin/www",
+    "test": "nyc -r text -r html ava -T 300000 -c 10 'test'",
+    "test-path": "nyc -r text -r html ava -T 300000 -c 10"
   },
   "keywords": [
     "demo",

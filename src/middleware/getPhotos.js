@@ -10,17 +10,24 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 const photoStoreWithConn = require('../stores/photo');
 
-module.exports = mysql => (req, res, next) => {
-  const photoStore = photoStoreWithConn(mysql);
+module.exports = (dbConn, queryConn) => (req, res, next) => {
+  const photoStore = photoStoreWithConn(dbConn, queryConn);
   return photoStore.list()
     .then((photos) => {
       res.locals.photos = photos;
       next();
     })
     .catch((e) => {
+      // translate connection error to be more readable
+      if (e.code === 'ECONNREFUSED') {
+        res.locals.error = {
+          code: 'MYSQL_CONNECTION_REFUSED',
+          message: `COULD NOT CONNECT TO ${e.address}:${e.port}`,
+        };
+        return next();
+      }
       res.locals.error = e;
       next();
     });

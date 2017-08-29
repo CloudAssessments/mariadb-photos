@@ -1,0 +1,17 @@
+version: '3'
+services:
+  mariadb-photos-essential:
+    build: .
+    image: mariadb-photos:essential
+    command: npm run prod
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: '3000'
+      MARIA_HOST:
+      MARIA_PORT:
+      MARIA_USER:
+      MARIA_PASSWORD:
+      REDIS_HOST:
+      REDIS_PORT:
+      REDIS_PASSWORD:

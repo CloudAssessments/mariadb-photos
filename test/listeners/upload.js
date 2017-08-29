@@ -15,7 +15,8 @@ const sinon = require('sinon');
 const upload = require('../../src/listeners/upload');
 
 test.beforeEach((t) => {
-  t.context.mockMysql = { query: sinon.mock() };
+  t.context.mockDbConn = { query: sinon.mock() };
+  t.context.mockQueryConn = { query: sinon.mock() };
   t.context.mockIo = { emit: sinon.mock() };
 });
 
@@ -26,14 +27,34 @@ test('should upload a photo to mysql', (t) => {
     buffer: JSON.parse(JSON.stringify(new Buffer('foo'))),
   };
 
-  t.context.mockMysql.query
+  t.context.mockDbConn.query
     .once()
-    .callsFake((sql, photo, cb) => {
-      t.is(sql, 'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)');
-      t.is(photo.name, testMessageJSON.name);
-      t.is(photo.mime_type, testMessageJSON.mimeType);
-      t.deepEqual(photo.data, new Buffer('foo'));
-      cb(null, { affectedRows: 1 });
+    .callsFake((sql, cb) => {
+      t.is(sql, 'CREATE DATABASE IF NOT EXISTS `photo_demo`');
+      cb(null, {});
+    });
+
+  let calls = 1;
+  t.context.mockQueryConn.query
+    .twice()
+    .callsFake((...args) => {
+      if (calls === 1) {
+        t.true(args[0].includes('CREATE TABLE'));
+        args[1](null, {});
+      }
+
+      if (calls === 2) {
+        t.is(
+          args[0],
+          'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)'
+        );
+        t.is(args[1].name, testMessageJSON.name);
+        t.is(args[1].mime_type, testMessageJSON.mimeType);
+        t.deepEqual(args[1].data, new Buffer('foo'));
+        args[2](null, { affectedRows: 1 });
+      }
+
+      calls += 1;
     });
 
   t.context.mockIo.emit
@@ -41,18 +62,33 @@ test('should upload a photo to mysql', (t) => {
     .withArgs('broadcast', 'uploaded')
     .resolves();
 
-  const uploadWithDeps = upload(t.context.mockMysql, t.context.mockIo);
+  const uploadWithDeps = upload(
+    t.context.mockDbConn,
+    t.context.mockQueryConn,
+    t.context.mockIo
+  );
+
   return uploadWithDeps('upload', JSON.stringify(testMessageJSON))
     .then(() => {
-      t.context.mockMysql.query.verify();
+      t.context.mockDbConn.query.verify();
+      t.context.mockQueryConn.query.verify();
     });
 });
 
 test('should reject if message is not valid JSON', (t) => {
-  t.context.mockMysql.query.never();
-  return upload(t.context.mockMysql, t.context.mockIo)('upload', 'invalidJSON')
+  t.context.mockDbConn.query.never();
+  t.context.mockQueryConn.query.never();
+
+  const uploadWithDeps = upload(
+    t.context.mockDbConn,
+    t.context.mockQueryConn,
+    t.context.mockIo
+  );
+
+  return uploadWithDeps('upload', 'invalidJSON')
     .catch(() => {
       t.pass();
-      t.context.mockMysql.query.verify();
+      t.context.mockDbConn.query.verify();
+      t.context.mockQueryConn.query.verify();
     });
 });
