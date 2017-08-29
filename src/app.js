@@ -11,6 +11,7 @@
   limitations under the License.
 */
 const express = require('express');
+const jimp = require('jimp');
 const multer = require('multer');
 const mysql2 = require('mysql2');
 const path = require('path');
@@ -58,6 +59,7 @@ app.post(
   '/photo',
   multer().single('uploadedImage'),
   require('./middleware/multipartToImage'),
+  require('./middleware/filterGreyscale')(jimp),
   require('./middleware/publishUpload')(pub)
 );
 
