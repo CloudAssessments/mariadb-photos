@@ -1,14 +1,5 @@
 version: '3'
 services:
-  # nginx to load balance multiple instances of mariadb-photos
-  nginx:
-    build: ./nginx
-    links:
-        - mariadb-photos
-        # - mariadb-photos-2
-    ports:
-        - "80:3000"
-
   mariadb:
     image: mariadb
     environment:
@@ -29,8 +20,8 @@ services:
     links:
       - mariadb:mysql
       - redis
-    # ports:
-    #   - '3000:3000'
+    ports:
+      - '3000:3000'
     environment:
       DOCKER_COMPOSE: 'true'
       PORT: '3000'
@@ -41,23 +32,3 @@ services:
       REDIS_HOST:
       REDIS_PORT:
       REDIS_PASSWORD:
-
-  # mariadb-photos-2:
-  #   build: .
-  #   image: mariadb-photos:test
-  #   command: npm run prod
-  #   links:
-  #     - mariadb:mysql
-  #     - redis
-  #   # ports:
-  #   #   - '3000:3000'
-  #   environment:
-  #     DOCKER_COMPOSE: 'true'
-  #     PORT: '3000'
-  #     MARIA_HOST:
-  #     MARIA_PORT:
-  #     MARIA_USER:
-  #     MARIA_PASSWORD:
-  #     REDIS_HOST:
-  #     REDIS_PORT:
-  #     REDIS_PASSWORD:
