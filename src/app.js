@@ -16,8 +16,13 @@ const multer = require('multer');
 const mysql2 = require('mysql2');
 const path = require('path');
 const redis = require('redis');
+const socketIo = require('socket.io');
 
 const app = express();
+
+// initialize a socket.io connection to be attached to the http server
+const io = socketIo();
+app.io = io;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -42,10 +47,11 @@ const redisServer = {
 };
 const pub = redis.createClient(redisServer);
 const sub = redis.createClient(redisServer);
-sub.on('message', require('./listeners/upload')(mysql));
+sub.on('message', require('./listeners/upload')(mysql, io));
 
 sub.on('error', err => console.error('REDIS_ERROR: ', err));
 sub.subscribe('upload');
+sub.subscribe('uploaded');
 
 // Routes: Homepage
 app.get(

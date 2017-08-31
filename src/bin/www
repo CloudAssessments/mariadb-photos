@@ -39,6 +39,14 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
+// setup socket.io
+const io = app.io;
+io.attach(server);
+io.on('connection', () => {
+  console.log('connected');
+});
+
+
 server.on('error', (error) => {
   if (error.syscall !== 'listen') {
     throw error;
