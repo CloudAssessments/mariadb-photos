@@ -12,9 +12,9 @@
 */
 const photoStoreWithConn = require('../stores/photo');
 
-module.exports = (mysql, io) => (channel, message) => {
+module.exports = (dbConn, queryConn, io) => (channel, message) => {
   try {
-    const photoStore = photoStoreWithConn(mysql);
+    const photoStore = photoStoreWithConn(dbConn, queryConn);
     const parsedMessage = JSON.parse(message);
 
     const photo = {

@@ -12,6 +12,8 @@
 */
 const mysql2 = require('mysql2');
 
+const database = process.env.MARIA_DATABASE || 'photo_demo';
+
 const conn = mysql2.createConnection({
   host: process.env.MARIA_HOST || (process.env.DOCKER_COMPOSE ? 'mysql' : undefined),
   port: process.env.MARIA_PORT,
@@ -20,7 +22,7 @@ const conn = mysql2.createConnection({
 });
 
 const dropDatabase = () => new Promise((resolve, reject) =>
-  conn.query('DROP DATABASE IF EXISTS `photo_demo`', (err, res) =>
+  conn.query(`DROP DATABASE IF EXISTS \`${database}\``, (err, res) =>
     (err ? reject(err) : resolve(res))
   )
 );

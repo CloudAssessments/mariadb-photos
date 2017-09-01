@@ -10,13 +10,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-
 const { test } = require('ava');
 const sinon = require('sinon');
 const photoStoreWithConn = require('../../src/stores/photo');
 
 test.beforeEach((t) => {
-  t.context.mockMysql = { query: sinon.mock() };
+  t.context.mockDbConn = { query: sinon.mock() };
+  t.context.mockQueryConn = { query: sinon.mock() };
 });
 
 test('upsert should execute an insert query to mysql and resolve the results', (t) => {
@@ -26,18 +26,40 @@ test('upsert should execute an insert query to mysql and resolve the results', (
     data: new Buffer('foo'),
   };
 
-  t.context.mockMysql.query
+  t.context.mockDbConn.query
     .once()
-    .callsFake((sql, photo, cb) => {
-      t.is(sql, 'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)');
-      t.is(photo, testPhoto);
-      cb(null, { affectedRows: 1 });
+    .callsFake((sql, cb) => {
+      t.is(sql, 'CREATE DATABASE IF NOT EXISTS `photo_demo`');
+      cb(null, {});
     });
 
-  return photoStoreWithConn(t.context.mockMysql).upsert(testPhoto)
+  let calls = 1;
+  t.context.mockQueryConn.query
+    .twice()
+    .callsFake((...args) => {
+      if (calls === 1) {
+        t.true(args[0].includes('CREATE TABLE'));
+        args[1](null, {});
+      }
+
+      if (calls === 2) {
+        t.is(
+          args[0],
+          'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)'
+        );
+        t.is(args[1], testPhoto);
+        args[2](null, { affectedRows: 1 });
+      }
+
+      calls += 1;
+    });
+
+  return photoStoreWithConn(t.context.mockDbConn, t.context.mockQueryConn)
+    .upsert(testPhoto)
     .then((res) => {
       t.is(res.affectedRows, 1);
-      t.context.mockMysql.query.verify();
+      t.context.mockDbConn.query.verify();
+      t.context.mockQueryConn.query.verify();
     });
 });
 
@@ -48,16 +70,134 @@ test('upsert should reject if query returns error', (t) => {
     data: new Buffer('foo'),
   };
 
-  t.context.mockMysql.query
+  t.context.mockDbConn.query
     .once()
-    .callsFake((sql, photo, cb) => {
-      t.is(sql, 'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)');
-      t.is(photo, testPhoto);
+    .callsFake((sql, cb) => {
+      t.is(sql, 'CREATE DATABASE IF NOT EXISTS `photo_demo`');
+      cb(null, {});
+    });
+
+  let calls = 1;
+  t.context.mockQueryConn.query
+    .twice()
+    .callsFake((...args) => {
+      if (calls === 1) {
+        t.true(args[0].includes('CREATE TABLE'));
+        args[1](null, {});
+      }
+
+      if (calls === 2) {
+        t.is(
+          args[0],
+          'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)'
+        );
+        t.is(args[1], testPhoto);
+        args[2](new Error('oops'));
+      }
+
+      calls += 1;
+    });
+
+  return t.throws(
+    photoStoreWithConn(t.context.mockDbConn, t.context.mockQueryConn).upsert(testPhoto),
+    'oops'
+  ).then(() => t.context.mockQueryConn.query.verify());
+});
+
+test('list should retrieve all images (with limit) from mysql', (t) => {
+  const testPhoto = {
+    name: 'test.jpeg',
+    mime_type: 'image/jpeg',
+    data: new Buffer('foo'),
+  };
+
+  t.context.mockDbConn.query
+    .once()
+    .callsFake((sql, cb) => {
+      t.is(sql, 'CREATE DATABASE IF NOT EXISTS `photo_demo`');
+      cb(null, {});
+    });
+
+  let calls = 1;
+  t.context.mockQueryConn.query
+    .twice()
+    .callsFake((...args) => {
+      if (calls === 1) {
+        t.true(args[0].includes('CREATE TABLE'));
+        args[1](null, {});
+      }
+
+      if (calls === 2) {
+        t.is(args[0], 'SELECT * FROM `photos` ORDER BY `id` DESC LIMIT ?');
+        t.is(args[1][0], 12);
+        args[2](null, [testPhoto, testPhoto]);
+      }
+
+      calls += 1;
+    });
+
+  return photoStoreWithConn(t.context.mockDbConn, t.context.mockQueryConn)
+    .list()
+    .then((res) => {
+      t.deepEqual(res, [testPhoto, testPhoto]);
+      t.context.mockDbConn.query.verify();
+      t.context.mockQueryConn.query.verify();
+    });
+});
+
+test('list should reject if query returns error', (t) => {
+  t.context.mockDbConn.query
+    .once()
+    .callsFake((sql, cb) => {
+      t.is(sql, 'CREATE DATABASE IF NOT EXISTS `photo_demo`');
+      cb(null, {});
+    });
+
+  let calls = 1;
+  t.context.mockQueryConn.query
+    .twice()
+    .callsFake((...args) => {
+      if (calls === 1) {
+        t.true(args[0].includes('CREATE TABLE'));
+        args[1](null, {});
+      }
+
+      if (calls === 2) {
+        t.is(args[0], 'SELECT * FROM `photos` ORDER BY `id` DESC LIMIT ?');
+        t.is(args[1][0], 12);
+        args[2](new Error('oops'));
+      }
+
+      calls += 1;
+    });
+
+  return t.throws(
+    photoStoreWithConn(t.context.mockDbConn, t.context.mockQueryConn).list(),
+    'oops'
+  ).then(() => t.context.mockQueryConn.query.verify());
+});
+
+test('should reject if asserting table query errors', (t) => {
+  t.context.mockDbConn.query
+    .once()
+    .callsFake((sql, cb) => {
+      t.is(sql, 'CREATE DATABASE IF NOT EXISTS `photo_demo`');
+      cb(null, {});
+    });
+
+  t.context.mockQueryConn.query
+    .once()
+    .callsFake((sql, cb) => {
+      t.true(sql.includes('CREATE TABLE'));
       cb(new Error('oops'));
     });
 
   return t.throws(
-    photoStoreWithConn(t.context.mockMysql).upsert(testPhoto),
+    photoStoreWithConn(t.context.mockDbConn, t.context.mockQueryConn).list(),
     'oops'
-  ).then(() => t.context.mockMysql.query.verify());
+  ).then(() => {
+    t.context.mockDbConn.query.verify();
+    t.context.mockQueryConn.query.verify();
+  });
 });
+

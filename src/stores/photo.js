@@ -11,17 +11,50 @@
   limitations under the License.
 */
 
-const list = conn => (limit = 12) => new Promise((resolve, reject) => {
+const database = process.env.MARIA_DATABASE || 'photo_demo';
+const assertDatabase = dbConn => new Promise((resolve, reject) =>
+  dbConn.query(
+    `CREATE DATABASE IF NOT EXISTS \`${database}\``,
+    (err, res) => (err ? reject(err) : resolve(res))
+  )
+);
+
+const assertTable = queryConn => new Promise((resolve, reject) => {
+  // eslint-disable-next-line
+  const sql = "CREATE TABLE IF NOT EXISTS `photos` (\
+    `id` int(11) unsigned NOT NULL AUTO_INCREMENT,\
+    `name` varchar(128) NOT NULL,\
+    `mime_type` varchar(128) NOT NULL,\
+    `data` longblob NOT NULL,\
+    `created` timestamp NOT NULL DEFAULT current_timestamp(),\
+    PRIMARY KEY (`id`),\
+    UNIQUE KEY `name` (`name`)\
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8;\
+  ";
+
+  queryConn.query(sql, (err, res) => (err ? reject(err) : resolve(res)));
+});
+
+const assert = (dbConn, queryConn) => assertDatabase(dbConn)
+  .then(() => assertTable(queryConn));
+
+const list = (dbConn, queryConn) => (limit = 12) => {
   const sql = 'SELECT * FROM `photos` ORDER BY `id` DESC LIMIT ?';
-  conn.query(sql, [limit], (err, res) => (err ? reject(err) : resolve(res)));
-});
+  return assert(dbConn, queryConn)
+    .then(() => new Promise((resolve, reject) =>
+      queryConn.query(sql, [limit], (err, res) => (err ? reject(err) : resolve(res)))
+    ));
+};
 
-const upsert = conn => photo => new Promise((resolve, reject) => {
+const upsert = (dbConn, queryConn) => (photo) => {
   const sql = 'INSERT INTO `photos` SET ? ON DUPLICATE KEY UPDATE data=VALUES(data)';
-  conn.query(sql, photo, (err, res) => (err ? reject(err) : resolve(res)));
-});
+  return assert(dbConn, queryConn)
+    .then(() => new Promise((resolve, reject) =>
+      queryConn.query(sql, photo, (err, res) => (err ? reject(err) : resolve(res)))
+    ));
+};
 
-module.exports = conn => ({
-  list: list(conn),
-  upsert: upsert(conn),
+module.exports = (dbConn, queryConn) => ({
+  list: list(dbConn, queryConn),
+  upsert: upsert(dbConn, queryConn),
 });

@@ -23,6 +23,7 @@ services:
     ports:
       - '3000:3000'
     environment:
+      DEBUG:
       DOCKER_COMPOSE: 'true'
       PORT: '3000'
       MARIA_HOST:
@@ -32,5 +33,4 @@ services:
       MARIA_DATABASE:
       REDIS_HOST:
       REDIS_PORT:
-      REDIS_URL:
       REDIS_PASSWORD:

@@ -14,9 +14,17 @@
 module.exports = (req, res) => {
   const ctx = {};
 
-  // surface errors to front-end if they exist
+  // surface errors in query string if they exist
   if (req.query && req.query.err) {
     ctx.err = req.query.err;
+  }
+
+  // surface errors in locals.error if they exist
+  if (res.locals && res.locals.error) {
+    ctx.err = JSON.stringify({
+      code: res.locals.error.code,
+      message: res.locals.error.message,
+    });
   }
 
   // pass in photos if they exist
