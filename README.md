@@ -51,6 +51,9 @@ A demo to enable users to get and upload photos using Node.js, MariaDB, Redis, a
 - `MARIA_PASSWORD`:
   - Default: none
   - Description: The password of the login needed for the MariaDB Server
+- `MARIA_DATABASE`:
+  - Default: "photo_demo"
+  - Description: The database to store the photos in
 - `REDIS_HOST`:
   - Default: none
   - Description: The host name of the Redis Server to use

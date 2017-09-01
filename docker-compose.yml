@@ -29,6 +29,7 @@ services:
       MARIA_PORT:
       MARIA_USER:
       MARIA_PASSWORD:
+      MARIA_DATABASE:
       REDIS_HOST:
       REDIS_PORT:
       REDIS_PASSWORD:

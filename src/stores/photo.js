@@ -10,9 +10,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+
+const database = process.env.MARIA_DATABASE || 'photo_demo';
 const assertDatabase = dbConn => new Promise((resolve, reject) =>
   dbConn.query(
-    'CREATE DATABASE IF NOT EXISTS `photo_demo`',
+    `CREATE DATABASE IF NOT EXISTS \`${database}\``,
     (err, res) => (err ? reject(err) : resolve(res))
   )
 );

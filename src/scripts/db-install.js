@@ -23,7 +23,7 @@ const config = {
 const conn = mysql2.createConnection(config);
 
 const createDatabase = () => new Promise((resolve, reject) =>
-  conn.query('CREATE DATABASE IF NOT EXISTS `photo_demo`', (err, res) =>
+  conn.query(`CREATE DATABASE IF NOT EXISTS \`${database}\``, (err, res) =>
     (err ? reject(err) : resolve(res))
   )
 );

@@ -42,7 +42,8 @@ const mysqlConfig = {
 const dbConn = mysql2.createPool(mysqlConfig);
 
 // MySQL Connection to run queries on the photo_demo database
-const queryConn = mysql2.createPool({ ...mysqlConfig, database: 'photo_demo' });
+const mariaDatabase = process.env.MARIA_DATABASE || 'photo_demo';
+const queryConn = mysql2.createPool({ ...mysqlConfig, database: mariaDatabase });
 
 // Let MySQL Errors fall through so the queries can surface errors to front-end
 dbConn.on('error', err => console.error('MySQL Error: ', err));
