@@ -12,7 +12,7 @@
     "clean": "npm run db-clean; rm -rf node_modules;",
     "db-clean": "node ./src/scripts/db-clean.js",
     "db-install": "node ./src/scripts/db-install.js",
-    "dev": "nodemon ./src/bin/www",
+    "dev": "DEBUG=true nodemon ./src/bin/www",
     "empty-uploads": "node ./src/scripts/empty-uploads",
     "lint": "eslint",
     "prod": "node ./src/bin/www",

@@ -23,6 +23,7 @@ services:
     ports:
       - '3000:3000'
     environment:
+      DEBUG:
       DOCKER_COMPOSE: 'true'
       PORT: '3000'
       MARIA_HOST:

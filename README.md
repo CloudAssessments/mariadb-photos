@@ -1,5 +1,5 @@
 
-File System Photo Upload Service
+MariaDB Photo Upload Service
 ===================
 
 PO: Anthony James
@@ -37,10 +37,13 @@ A demo to enable users to get and upload photos using Node.js, MariaDB, Redis, a
 - `PORT`:
   - Default: "3000"
   - Description: The port number to listen on
+- `DEBUG`:
+  - Default: none
+  - Description: Debug flag to enable a "View Environments" endpoint
 - `MARIA_HOST`:
   - Default:
-  - Docker: "mysql"
-  - Local Machine: "localhost"
+    - Docker: "mysql"
+    - Local Machine: "localhost"
   - Description: The host name of the MariaDB Server to use
 - `MARIA_PORT`:
   - Default: "3306"
@@ -74,7 +77,10 @@ There is a script at `src/scripts/empty-uploads` remove all images from the conf
 
 ## Debugging
 ### Environment Variables
-You can view the relevant environment variables via: `localhost:3000/debug/app-vars`
+You can view the relevant environment variables via the following steps:
+1. Set the DEBUG environment variable to true when running the app
+    - e.g.) `DEBUG=true docker-compose up`
+2. Navigate to `localhost:3000/debug/app-vars`
 ### Sys Alive
 You can verify the server is up and running via `localhost:3000/sys/alive`
 ### MariaDB (MySQL)

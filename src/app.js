@@ -80,18 +80,21 @@ app.post(
   require('./middleware/publishUpload')(pub)
 );
 
-// Routes: Debug - Show Environment and App Variables
-app.get('/debug/app-vars', (req, res) => res.json({
-  PORT: process.env.PORT,
-  MARIA_HOST: process.env.MARIA_HOST,
-  MARIA_PORT: process.env.MARIA_PORT,
-  MARIA_USER: process.env.MARIA_USER,
-  MARIA_PASSWORD: process.env.MARIA_PASSWORD,
-  REDIS_HOST: process.env.REDIS_HOST,
-  REDIS_PORT: process.env.REDIS_PORT,
-  REDIS_URL: process.env.REDIS_URL,
-  REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-}));
+// Routes: Show Environment and App Variables - Debug Mode Only
+
+if (process.env.DEBUG) {
+  app.get('/debug/app-vars', (req, res) => res.json({
+    PORT: process.env.PORT,
+    MARIA_HOST: process.env.MARIA_HOST,
+    MARIA_PORT: process.env.MARIA_PORT,
+    MARIA_USER: process.env.MARIA_USER,
+    MARIA_PASSWORD: process.env.MARIA_PASSWORD,
+    REDIS_HOST: process.env.REDIS_HOST,
+    REDIS_PORT: process.env.REDIS_PORT,
+    REDIS_URL: process.env.REDIS_URL,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD,
+  }));
+}
 
 // Routes: Sys Alive
 app.get('/sys/alive', (req, res) => res.send('mariadb-photos at your [micro]service!'));
