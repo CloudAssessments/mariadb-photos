@@ -85,6 +85,7 @@ app.post(
 if (process.env.DEBUG) {
   app.get('/debug/app-vars', (req, res) => res.json({
     PORT: process.env.PORT,
+    DEBUG: process.env.DEBUG,
     MARIA_HOST: process.env.MARIA_HOST,
     MARIA_PORT: process.env.MARIA_PORT,
     MARIA_USER: process.env.MARIA_USER,
