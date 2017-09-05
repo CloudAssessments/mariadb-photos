@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:8.4
 
 # Deps
 RUN apt-get update && apt-get install -y ca-certificates git-core ssh
